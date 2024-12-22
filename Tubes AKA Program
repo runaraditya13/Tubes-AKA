@@ -1,0 +1,126 @@
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+struct Boss {
+    string name;
+    int power;
+};
+
+void quickSortRecursive(Boss bosses[], int low, int high) {
+    if (low >= high) return;
+
+    int pivot = bosses[high].power;
+    int i = low - 1;
+
+    for (int j = low; j < high; ++j) {
+        if (bosses[j].power <= pivot) {
+            ++i;
+            swap(bosses[i], bosses[j]);
+        }
+    }
+    swap(bosses[i + 1], bosses[high]);
+
+    int partitionIndex = i + 1;
+    quickSortRecursive(bosses, low, partitionIndex - 1);
+    quickSortRecursive(bosses, partitionIndex + 1, high);
+}
+
+void quickSortIterative(Boss bosses[], int low, int high) {
+    int stack[high - low + 1];
+    int top = -1;
+
+    stack[++top] = low;
+    stack[++top] = high;
+
+    while (top >= 0) {
+        high = stack[top--];
+        low = stack[top--];
+
+        int pivot = bosses[high].power;
+        int i = low - 1;
+
+        for (int j = low; j < high; ++j) {
+            if (bosses[j].power <= pivot) {
+                ++i;
+                swap(bosses[i], bosses[j]);
+            }
+        }
+        swap(bosses[i + 1], bosses[high]);
+
+        int partitionIndex = i + 1;
+
+        if (partitionIndex - 1 > low) {
+            stack[++top] = low;
+            stack[++top] = partitionIndex - 1;
+        }
+
+        if (partitionIndex + 1 < high) {
+            stack[++top] = partitionIndex + 1;
+            stack[++top] = high;
+        }
+    }
+}
+
+int filterBosses(Boss bosses[], Boss filtered[], int size, int playerLevel) {
+    int count = 0;
+    for (int i = 0; i < size; ++i) {
+        if (bosses[i].power <= playerLevel) {
+            filtered[count++] = bosses[i];
+        }
+    }
+    return count;
+}
+
+void printBosses(Boss bosses[], int size) {
+    for (int i = 0; i < size; ++i) {
+        cout << bosses[i].name << " (Power: " << bosses[i].power << ")\n";
+    }
+}
+
+int main() {
+    Boss bosses[] = {
+    {"Margit, the Fell Omen", 10},
+    {"Godrick the Grafted", 25},
+    {"Rennala, Queen of the Full Moon", 15},
+    {"Starscourge Radahn", 50},
+    {"Rykard, Lord of Blasphemy", 40},
+    {"Mohg, Lord of Blood", 60},
+    {"Malenia, Blade of Miquella", 70},
+    {"Radagon of the Golden Order", 90},
+    {"Elden Beast", 100},
+    {"Dragonlord Placidusax", 85},
+    {"Fire Giant", 45},
+    {"Maliketh, the Black Blade", 55},
+    {"Commander Niall", 35},
+    {"Godfrey, First Elden Lord", 75},
+    {"Astel, Naturalborn of the Void", 65},
+    {"Loretta, Knight of the Haligtree", 30},
+    {"Royal Knight Loretta", 20},
+    {"Magma Wyrm Makar", 18},
+    {"Lichdragon Fortissax", 80},
+    {"Beast Clergyman", 50},
+    {"Giant Crusher", 33},
+    {"Bloodhound Knight Darriwil", 22},
+    {"Godskin Apostle", 48},
+    {"Godskin Noble", 52},
+    {"Alabaster Lord", 28},
+    {"Bell Bearing Hunter", 42}
+};
+    int size = sizeof(bosses) / sizeof(bosses[0]);
+
+    int playerLevel;
+    cout << "Enter player level: ";
+    cin >> playerLevel;
+
+    Boss filteredBosses[size];
+    int filteredSize = filterBosses(bosses, filteredBosses, size, playerLevel);
+
+    quickSortRecursive(filteredBosses, 0, filteredSize - 1);
+    cout << "\nBos yang bisa anda lawan:\n";
+    printBosses(filteredBosses, filteredSize);
+
+
+    return 0;
+}
